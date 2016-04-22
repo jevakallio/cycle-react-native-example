@@ -9,6 +9,7 @@
     "@cycle/core": "^6.0.3",
     "@cycle/react-native": "git@github.com:jevakallio/cycle-react-native.git",
     "react-native": "^0.24.0",
+    "react": "^0.14.8",
     "rx": "^4.1.0"
   }
 }
