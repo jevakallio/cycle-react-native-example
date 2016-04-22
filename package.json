@@ -1,0 +1,14 @@
+{
+  "name": "RNCycle",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "@cycle/core": "^6.0.3",
+    "@cycle/react-native": "git@github.com:jevakallio/cycle-react-native.git",
+    "react-native": "^0.24.0",
+    "rx": "^4.1.0"
+  }
+}
