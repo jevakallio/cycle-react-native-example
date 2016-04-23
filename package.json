@@ -8,7 +8,7 @@
   "dependencies": {
     "@cycle/core": "^6.0.3",
     "@cycle/http": "8.2.2",
-    "@cycle/react-native": "git@github.com:jevakallio/cycle-react-native.git",
+    "@cycle/react-native": "git@github.com:jevakallio/cycle-react-native.git#master",
     "react": "0.14.8",
     "react-native": "^0.24.0",
     "rx": "^4.1.0"
