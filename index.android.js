@@ -1,51 +1,54 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-'use strict';
-import React, {
-  AppRegistry,
-  Component,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import {Rx, run} from '@cycle/core';
+import React from 'react-native';
+import makeReactNativeDriver from '@cycle/react-native/src/driver';
 
-class RNCycle extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
+let {StyleSheet, TouchableOpacity, Text, View, ScrollView, Image, AlertIOS} = React;
+
+function main({RN}) {
+  return {
+    RN: model(intent(RN)).map(view)
+  };
+}
+
+function intent(inputs) {
+  return {
+    increment: inputs
+      .select('button')
+      .events('press')
+      .map(ev => +1)
   }
 }
 
+function model({increment}) {
+  return increment
+    .startWith(0)
+    .scan((state, n) => state + n)
+}
+
+function view(state) {
+  return (
+    <ScrollView>
+      <TouchableOpacity selector="button">
+        <Text style={styles.button}>
+          Increment
+        </Text>
+      </TouchableOpacity>
+      <Text>
+        You have clicked the button {state} times.
+      </Text>
+    </ScrollView>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  button: {
+    marginTop: 100,
+    backgroundColor: 'red',
+    color: 'white',
+    padding: 20
+  }
 });
 
-AppRegistry.registerComponent('RNCycle', () => RNCycle);
+run(main, {
+  RN: makeReactNativeDriver('RNCycle'),
+});
