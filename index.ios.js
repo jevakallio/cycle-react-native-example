@@ -1,9 +1,11 @@
 import {Rx, run} from '@cycle/core';
 import React from 'react-native';
 import makeReactNativeDriver from '@cycle/react-native/src/driver';
-import AnimationDongle from './src/AnimationDongle';
+import CycleAnimated from '@cycle/react-native/src/Animated';
+import Touchable from '@cycle/react-native/src/Touchable';
 
-let {Animated, StyleSheet, TouchableOpacity, Text, View, ScrollView, Image, AlertIOS, Dimensions} = React;
+let {Animated, StyleSheet, Text, View, ScrollView, Image, AlertIOS, Dimensions} = React;
+let {TouchableOpacity} = Touchable;
 
 let windowWidth = Dimensions.get('window').width;
 
@@ -36,7 +38,7 @@ function view(state) {
           Increment
         </Text>
       </TouchableOpacity>
-      <AnimationDongle.Image
+      <CycleAnimated.Image
         animation={Animated.spring}
         initialValue={0}
         value={(state % 2 === 0) ? 0 : 1}
@@ -52,8 +54,8 @@ function view(state) {
         }}
         source={{uri: "http://i.imgur.com/spJ0lss.jpg"}}
       >
-      </AnimationDongle.Image>
-      <AnimationDongle.Text
+      </CycleAnimated.Image>
+      <CycleAnimated.Text
         animation={Animated.spring}
         initialValue={0}
         value={(state % 2 === 0) ? 0 : 1}
@@ -65,8 +67,8 @@ function view(state) {
         }}
       >
         Whoa!!!
-      </AnimationDongle.Text>
-      <AnimationDongle.View
+      </CycleAnimated.Text>
+      <CycleAnimated.View
         animation={Animated.timing}
         options={{
           duration: 250
@@ -89,7 +91,7 @@ function view(state) {
         }}
       >
         <Text>Whoa!!!</Text>
-      </AnimationDongle.View>
+      </CycleAnimated.View>
       <Text>
         You have clicked the button {state} times.
       </Text>
