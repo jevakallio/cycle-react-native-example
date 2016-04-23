@@ -2,6 +2,7 @@ import {run} from '@cycle/core';
 import {Rx} from 'rx';
 import React from 'react-native';
 import makeReactNativeDriver from '@cycle/react-native/src/driver';
+import ListView from '@cycle/react-native/src/ListView';
 import {makeHTTPDriver} from '@cycle/http';
 import styles from './styles';
 
@@ -22,9 +23,8 @@ function intent(RN, HTTP) {
     .mergeAll()
     .map(res => {
       let arr = JSON.parse(res.text)
-      return arr.length;
-    })
-    .startWith('Loading...');
+      return arr;
+    });
 
   return {
         increment: RN
@@ -51,18 +51,24 @@ function view({counter, test}) {
     <ScrollView>
       <Image style={styles.image} source={require("./img/logo.png")} />
       <Text style={styles.header}>RNCycle</Text>
-      <Text style={styles.stars}>	★{test}</Text>
+      <Text style={styles.stars}>	★{test.length}</Text>
       <TouchableOpacity selector="button">
         <View style={styles.button}>
-          <Text style={styles.buttonText}>Increment</Text>
+          <Text style={styles.buttonText}>{counter}</Text>
         </View>
       </TouchableOpacity>
-      <View>
-        <Text style={styles.presses}>
-          You have clicked the button
-          <Text style={styles.huge}> {counter} </Text> times.
-        </Text>
-      </View>
+
+      <Text style={styles.stargazers}>Stargazers</Text>
+      <ListView
+        items={test}
+        renderRow={item => {
+          return (
+              <Text style={styles.stargazer}>
+                {item.login}
+              </Text>
+          );
+        }}
+      />
     </ScrollView>
   );
 }

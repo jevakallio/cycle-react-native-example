@@ -33,5 +33,13 @@ export default StyleSheet.create({
   presses: {
     marginTop: 60,
     textAlign: 'center'
+  },
+  stargazers: {
+    fontSize: 30,
+    marginTop: 30
+  },
+  stargazer: {
+    fontSize: 20,
+    padding: 15
   }
 });
