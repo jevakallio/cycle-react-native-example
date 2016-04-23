@@ -66,6 +66,7 @@ function model({increment, add, goToSecondView, back}) {
   const initialNavigationState = {
     key: 'MainNavigation',
     index: 0,
+    title: 'Cycle Native',
     children: [
       {key: 'Counter'}
     ]
@@ -87,7 +88,7 @@ function model({increment, add, goToSecondView, back}) {
   .scan((prevState, action) => {
     return action.type === 'back'
       ? NavigationStateUtils.pop(prevState)
-      : NavigationStateUtils.push(prevState, action);
+      : NavigationStateUtils.push(prevState, action)
   })
 
   return number.combineLatest(list, navigationState, (number, list, navigationState) =>
