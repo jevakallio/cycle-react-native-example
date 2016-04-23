@@ -1,6 +1,22 @@
 import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
+  profile: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  profileTitle: {
+    padding: 20,
+    textAlign: 'center',
+    fontSize: 30,
+    fontWeight: 'bold'
+  },
+  container: {
+    backgroundColor: 'white',
+    marginTop: 64,
+    flex: 1,
+    padding: 20
+  },
   image: {
     margin: 0,
     marginTop: 20,
