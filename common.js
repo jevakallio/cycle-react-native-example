@@ -4,12 +4,15 @@ import React from 'react-native';
 import makeReactNativeDriver, {getBackHandler} from '@cycle/react-native/src/driver';
 import Touchable from '@cycle/react-native/src/Touchable';
 import ListView from '@cycle/react-native/src/ListView';
+import CycleAnimated from '@cycle/react-native/src/Animated';
 import {makeHTTPDriver} from '@cycle/http';
 import NavigationStateUtils from 'NavigationStateUtils';
 import styles from './styles';
 
 const REPO_URL = 'https://api.github.com/repos/cyclejs/cycle-react-native';
 const COLL_URL = 'https://api.github.com/repos/cyclejs/cycle-react-native/events';
+const FRACTAL_ARCH_URL = 'http://49.media.tumblr.com/1db4a8e1ca5078c083be764fff512c5d/tumblr_n3wqbrrbqz1sulbzio1_400.gif';
+const CHILICORN_URL = 'https://raw.githubusercontent.com/futurice/spiceprogram/master/assets/img/logo/chilicorn_no_text-256.png';
 
 const onNavigateBack = action => {
   const backActionHandler = getBackHandler();
@@ -29,6 +32,8 @@ const {
   Image,
   AlertIOS
 } = React;
+const windowWidth = Dimensions.get('window').width;
+
 
 const {
   TouchableOpacity,
@@ -66,6 +71,12 @@ function intent(RN, HTTP) {
 
     eventsResponse: eventsResponse$,
 
+    chilicornState: RN
+      .select('chilicorn')
+      .events('press')
+      .startWith(0)
+      .scan(acc => acc ? 0 : 1),
+
     goToSecondView: RN
       .select('listitem')
       .events('press')
@@ -83,13 +94,21 @@ function intent(RN, HTTP) {
         key: 'Fractal'
       })),
 
+    goToCreditsView: RN
+      .select('credits')
+      .events('press')
+      .map(profile => ({
+        type: 'push',
+        key: 'Credits'
+      })),
+
     back: RN
       .navigateBack()
       .map({type: 'back'})
   }
 }
 
-function model({increment, starsResponse, eventsResponse, goToSecondView, goToThirdView, back}) {
+function model({increment, starsResponse, eventsResponse, chilicornState, goToSecondView, goToThirdView, goToCreditsView, back}) {
 
   // Initial state
   const initialNavigationState = {
@@ -113,6 +132,7 @@ function model({increment, starsResponse, eventsResponse, goToSecondView, goToTh
   const navigationState = Rx.Observable.merge(
     goToSecondView,
     goToThirdView,
+    goToCreditsView,
     back
   )
     .startWith(initialNavigationState)
@@ -122,9 +142,10 @@ function model({increment, starsResponse, eventsResponse, goToSecondView, goToTh
         : NavigationStateUtils.push(prevState, action)
     })
 
-  return Rx.Observable.combineLatest(counter, starsResponse, eventsResponse, navigationState, selectedProfile,
-    (counter, starsResponse, eventsResponse, navigationState, selectedProfile) => ({
+  return Rx.Observable.combineLatest(counter, chilicornState, starsResponse, eventsResponse, navigationState, selectedProfile,
+    (counter, chilicornState, starsResponse, eventsResponse, navigationState, selectedProfile) => ({
       counter,
+      chilicornState,
       starsResponse,
       eventsResponse,
       navigationState,
@@ -170,6 +191,8 @@ function view(model) {
             return renderCard(ProfileView(model), navigationProps);
           case 'Fractal':
             return renderCard(FractalArchitectureExampleView(model), navigationProps);
+          case 'Credits':
+            return renderCard(CreditsView(model), navigationProps);
           default:
             console.error('Unexpected view', navigationProps, key);
             return renderCard(<Text>Everything is fucked</Text>, navigationProps);
@@ -200,7 +223,7 @@ function CounterView({counter, starsResponse, eventsResponse}) {
         items={eventsResponse}
         renderRow={item => {
           return (
-            <TouchableOpacity selector='listitem' payload={item}>
+            <TouchableOpacity selector='listitem' payload={item.actor}>
               <Text style={styles.stargazer}>
                   {item.type} by {item.actor.login}
               </Text>
@@ -214,7 +237,7 @@ function CounterView({counter, starsResponse, eventsResponse}) {
 
 function ProfileView({selectedProfile}) {
   console.log(selectedProfile);
-  const size = Dimensions.get('window').width / 2;
+  const size = windowWidth / 2;
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profile}>
@@ -232,28 +255,80 @@ function ProfileView({selectedProfile}) {
       </View>
       <Text style={styles.profileTitle}>{selectedProfile.login}</Text>
       {renderButton('fractal', 'Fractal architecture example')}
+      {renderButton('credits', 'Demo Credits')}
     </ScrollView>
   )
 }
 
 function FractalArchitectureExampleView(model) {
-  const size = Dimensions.get('window').width;
+  const size = windowWidth;
   return (
     <View style={styles.fractal}>
       <Image
         source={{
-          uri: 'http://49.media.tumblr.com/1db4a8e1ca5078c083be764fff512c5d/tumblr_n3wqbrrbqz1sulbzio1_400.gif',
+          uri: FRACTAL_ARCH_URL,
           width: size,
           height: size
         }}
       />
       <Image
         source={{
-          uri: 'http://49.media.tumblr.com/1db4a8e1ca5078c083be764fff512c5d/tumblr_n3wqbrrbqz1sulbzio1_400.gif',
+          uri: FRACTAL_ARCH_URL,
           width: size,
           height: size
         }}
       />
     </View>
+  );
+}
+
+function CreditsView({chilicornState}) {
+  return (
+    <ScrollView style={styles.container}>
+      <TouchableWithoutFeedback selector='chilicorn' payload='true'>
+        <CycleAnimated.Image
+          animation={Animated.timing}
+          initialValue={0}
+          value={chilicornState}
+          animate={{
+            transform: [
+              {
+                rotate: {
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '-3600deg']
+                }
+              },
+              {
+                scale: {
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [1, 0.5, 1]
+                }
+              }
+            ]
+          }}
+          options={{
+            duration: 5000
+          }}
+
+          source={{
+            width: windowWidth - 30,
+            height: windowWidth - 30,
+            uri: CHILICORN_URL
+          }}
+        >
+        </CycleAnimated.Image>
+      </TouchableWithoutFeedback>
+
+      <View style={styles.creditsList}>
+        <Text style={styles.creditsListTitle}>Thank you #CycleConf!</Text>
+        <Text style={styles.creditsListItem}>Hadrien de Cuzey</Text>
+        <Text style={styles.creditsListItem}>Oskar Ehnström</Text>
+        <Text style={styles.creditsListItem}>Jani Eväkallio</Text>
+        <Text style={styles.creditsListItem}>Ossi Hanhinen</Text>
+        <Text style={styles.creditsListItem}>Jens Krause</Text>
+        <Text style={styles.creditsListItem}>Justin Woo</Text>
+      </View>
+
+    </ScrollView>
   );
 }

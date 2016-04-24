@@ -1,6 +1,20 @@
 import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
+  creditsList: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  creditsListItem: {
+    fontSize: 30,
+    padding: 10
+  },
+  creditsListTitle: {
+    fontSize: 36,
+    padding: 20,
+    color: '#329e41',
+    fontWeight: 'bold'
+  },
   profile: {
     flex: 1,
     alignItems: 'center'
@@ -34,7 +48,7 @@ export default StyleSheet.create({
     marginBottom: 80
   },
   button: {
-    marginTop: 0,
+    margin: 10,
     backgroundColor: 'green',
     padding: 20,
     flexDirection: 'column',
