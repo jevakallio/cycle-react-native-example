@@ -49,18 +49,12 @@ function intent(RN, HTTP) {
   let starsResponse$ = HTTP
     .filter(res$ => res$.request.url === REPO_URL)
     .mergeAll()
-    .map(res => {
-      let arr = JSON.parse(res.text)
-      return arr;
-    });
+    .map(res => res.body);
 
     let eventsResponse$ = HTTP
       .filter(res$ => res$.request.url === COLL_URL)
       .mergeAll()
-      .map(res => {
-        let arr = JSON.parse(res.text);
-        return arr;
-      });
+      .map(res => res.body);
 
   return {
     increment: RN
