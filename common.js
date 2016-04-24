@@ -68,13 +68,21 @@ function intent(RN, HTTP) {
         data: profile
       })),
 
+    goToThirdView: RN
+      .select('fractal')
+      .events('press')
+      .map(profile => ({
+        type: 'push',
+        key: 'Fractal'
+      })),
+
     back: RN
       .navigateBack()
       .map({type: 'back'})
   }
 }
 
-function model({increment, response, goToSecondView, back}) {
+function model({increment, response, goToSecondView, goToThirdView, back}) {
 
   // Initial state
   const initialNavigationState = {
@@ -95,7 +103,11 @@ function model({increment, response, goToSecondView, back}) {
     .startWith({data: {}})
     .map(({data}) => data);
 
-  const navigationState = Rx.Observable.merge(goToSecondView, back)
+  const navigationState = Rx.Observable.merge(
+    goToSecondView,
+    goToThirdView,
+    back
+  )
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
       return action.type === 'back'
@@ -124,6 +136,16 @@ function renderCard(vdom, navigationProps) {
   );
 }
 
+function renderButton(selector, text) {
+  return (
+    <TouchableOpacity selector={selector}>
+      <View style={styles.button}>
+        <Text style={styles.buttonText}>{text}</Text>
+      </View>
+    </TouchableOpacity>
+  )
+}
+
 function view(model) {
   return (
     <NavigationExperimental.AnimatedView
@@ -138,6 +160,8 @@ function view(model) {
             return renderCard(CounterView(model), navigationProps);
           case 'Profile':
             return renderCard(ProfileView(model), navigationProps);
+          case 'Fractal':
+            return renderCard(FractalArchitectureExampleView(model), navigationProps);
           default:
             console.error('Unexpected view', navigationProps, key);
             return renderCard(<Text>Everything is fucked</Text>, navigationProps);
@@ -160,11 +184,8 @@ function CounterView({counter, response}) {
       <Image style={styles.image} source={require("./img/logo.png")} />
       <Text style={styles.header}>RNCycle</Text>
       <Text style={styles.stars}>	★{response.length}</Text>
-      <TouchableOpacity selector="button">
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>{counter}</Text>
-        </View>
-      </TouchableOpacity>
+
+      {renderButton('button', counter)}
 
       <Text style={styles.stargazers}>Stargazers</Text>
       <ListView
@@ -202,6 +223,29 @@ function ProfileView({selectedProfile}) {
         />
       </View>
       <Text style={styles.profileTitle}>{selectedProfile.login}</Text>
+      {renderButton('fractal', 'Fractal architecture example')}
     </ScrollView>
   )
+}
+
+function FractalArchitectureExampleView(model) {
+  const size = Dimensions.get('window').width;
+  return (
+    <View style={styles.fractal}>
+      <Image
+        source={{
+          uri: 'http://49.media.tumblr.com/1db4a8e1ca5078c083be764fff512c5d/tumblr_n3wqbrrbqz1sulbzio1_400.gif',
+          width: size,
+          height: size
+        }}
+      />
+      <Image
+        source={{
+          uri: 'http://49.media.tumblr.com/1db4a8e1ca5078c083be764fff512c5d/tumblr_n3wqbrrbqz1sulbzio1_400.gif',
+          width: size,
+          height: size
+        }}
+      />
+    </View>
+  );
 }
