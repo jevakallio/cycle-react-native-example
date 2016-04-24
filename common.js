@@ -173,7 +173,7 @@ function CounterView({counter, response}) {
           return (
             <TouchableOpacity selector='listitem' payload={item}>
               <Text style={styles.stargazer}>
-                {item.login}
+                ★ {item.login}
               </Text>
             </TouchableOpacity>
           );
@@ -183,14 +183,12 @@ function CounterView({counter, response}) {
   );
 }
 
-
 function ProfileView({selectedProfile}) {
   console.log(selectedProfile);
   const size = Dimensions.get('window').width / 2;
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profile}>
-
         <Image
           style={{
             borderRadius: size / 2

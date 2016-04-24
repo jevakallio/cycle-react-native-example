@@ -30,10 +30,11 @@ export default StyleSheet.create({
   stars: {
     color: 'rgb(255, 222, 0)',
     fontSize: 30,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginBottom: 80
   },
   button: {
-    marginTop: 100,
+    marginTop: 0,
     backgroundColor: 'green',
     padding: 20,
     flexDirection: 'column',
@@ -56,6 +57,7 @@ export default StyleSheet.create({
   },
   stargazer: {
     fontSize: 20,
-    padding: 15
+    paddingTop: 15,
+    paddingBottom: 15
   }
 });
