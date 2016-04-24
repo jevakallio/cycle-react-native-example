@@ -8,7 +8,8 @@ import {makeHTTPDriver} from '@cycle/http';
 import NavigationStateUtils from 'NavigationStateUtils';
 import styles from './styles';
 
-const URL = 'https://api.github.com/repos/cyclejs/cycle-react-native/stargazers';
+const REPO_URL = 'https://api.github.com/repos/cyclejs/cycle-react-native';
+const COLL_URL = 'https://api.github.com/repos/cyclejs/cycle-react-native/events';
 
 const onNavigateBack = action => {
   const backActionHandler = getBackHandler();
@@ -35,7 +36,9 @@ const {
 } = Touchable;
 
 export function main({RN, HTTP}) {
-  let request$ = Rx.Observable.just({url: URL});
+  let requestStars$ = Rx.Observable.just({url: REPO_URL});
+  let requestEvents$ = Rx.Observable.just({url: COLL_URL});
+  let request$ = Rx.Observable.merge(requestStars$, requestEvents$);
   return {
     RN: model(intent(RN, HTTP)).map(view),
     HTTP: request$
@@ -43,13 +46,21 @@ export function main({RN, HTTP}) {
 }
 
 function intent(RN, HTTP) {
-  let httpResponse$ = HTTP
-    .filter(res$ => res$.request.url === URL)
+  let starsResponse$ = HTTP
+    .filter(res$ => res$.request.url === REPO_URL)
     .mergeAll()
     .map(res => {
       let arr = JSON.parse(res.text)
       return arr;
     });
+
+    let eventsResponse$ = HTTP
+      .filter(res$ => res$.request.url === COLL_URL)
+      .mergeAll()
+      .map(res => {
+        let arr = JSON.parse(res.text);
+        return arr;
+      });
 
   return {
     increment: RN
@@ -57,7 +68,9 @@ function intent(RN, HTTP) {
       .events('press')
       .map(ev => +1),
 
-    response: httpResponse$,
+    starsResponse: starsResponse$,
+
+    eventsResponse: eventsResponse$,
 
     goToSecondView: RN
       .select('listitem')
@@ -82,7 +95,7 @@ function intent(RN, HTTP) {
   }
 }
 
-function model({increment, response, goToSecondView, goToThirdView, back}) {
+function model({increment, starsResponse, eventsResponse, goToSecondView, goToThirdView, back}) {
 
   // Initial state
   const initialNavigationState = {
@@ -115,10 +128,11 @@ function model({increment, response, goToSecondView, goToThirdView, back}) {
         : NavigationStateUtils.push(prevState, action)
     })
 
-  return Rx.Observable.combineLatest(counter, response, navigationState, selectedProfile,
-    (counter, response, navigationState, selectedProfile) => ({
+  return Rx.Observable.combineLatest(counter, starsResponse, eventsResponse, navigationState, selectedProfile,
+    (counter, starsResponse, eventsResponse, navigationState, selectedProfile) => ({
       counter,
-      response,
+      starsResponse,
+      eventsResponse,
       navigationState,
       selectedProfile
     }));
@@ -178,23 +192,23 @@ function view(model) {
   );
 }
 
-function CounterView({counter, response}) {
+function CounterView({counter, starsResponse, eventsResponse}) {
   return (
     <ScrollView style={styles.container}>
       <Image style={styles.image} source={require("./img/logo.png")} />
       <Text style={styles.header}>RNCycle</Text>
-      <Text style={styles.stars}>	★{response.length}</Text>
+      <Text style={styles.stars}>	★{starsResponse.stargazers_count}</Text>
 
       {renderButton('button', counter)}
 
-      <Text style={styles.stargazers}>Stargazers</Text>
+      <Text style={styles.stargazers}>Events</Text>
       <ListView
-        items={response}
+        items={eventsResponse}
         renderRow={item => {
           return (
             <TouchableOpacity selector='listitem' payload={item}>
               <Text style={styles.stargazer}>
-                ★ {item.login}
+                  {item.type} by {item.actor.login}
               </Text>
             </TouchableOpacity>
           );
