@@ -1,5 +1,4 @@
-import {run} from '@cycle/core';
-import {Rx} from 'rx';
+import xs from 'xstream';
 import React from 'react-native';
 import makeReactNativeDriver, {getBackHandler} from '@cycle/react-native/src/driver';
 import Touchable from '@cycle/react-native/src/Touchable';
@@ -35,7 +34,7 @@ const {
 } = Touchable;
 
 export function main({RN, HTTP}) {
-  let request$ = Rx.Observable.just({url: URL});
+  let request$ = xs.of({url: URL});
   return {
     RN: model(intent(RN, HTTP)).map(view),
     HTTP: request$
@@ -95,7 +94,7 @@ function model({increment, response, goToSecondView, back}) {
     .startWith({data: {}})
     .map(({data}) => data);
 
-  const navigationState = Rx.Observable.merge(goToSecondView, back)
+  const navigationState = xs.merge(goToSecondView, back)
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
       return action.type === 'back'
@@ -103,7 +102,7 @@ function model({increment, response, goToSecondView, back}) {
         : NavigationStateUtils.push(prevState, action)
     })
 
-  return Rx.Observable.combineLatest(counter, response, navigationState, selectedProfile,
+  return xs.combine(counter, response, navigationState, selectedProfile,
     (counter, response, navigationState, selectedProfile) => ({
       counter,
       response,
