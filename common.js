@@ -135,6 +135,13 @@ function model({increment, starsResponse, eventsResponse, chilicornState, goToSe
     goToCreditsView,
     back
   )
+    .distinctUntilChanged(navigationState => navigationState, (a, b) => {
+      if (a.type === `back` && b.type === `back`) {
+        return false
+      }
+
+      return a.key === b.key
+    })
     .startWith(initialNavigationState)
     .scan((prevState, action) => {
       return action.type === 'back'
